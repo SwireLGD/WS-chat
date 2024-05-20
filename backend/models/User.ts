@@ -63,6 +63,9 @@ UserSchema.set('toJSON', {
     delete ret.password;
     return ret;
   },
+},
+{
+  versionKey: false,
 });
 
 const User = mongoose.model<UserFields, UserModel>('User', UserSchema);
