@@ -34,3 +34,8 @@ export interface ValidationError {
 export interface GlobalError {
     error: string;
 }
+
+export interface Message {
+    username: string;
+    text: string;
+}

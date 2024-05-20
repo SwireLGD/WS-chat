@@ -2,7 +2,6 @@ import React, {useState} from 'react';
 import {Button, Menu, MenuItem} from "@mui/material";
 import { useAppDispatch } from '../../app/hooks';
 import { User } from '../../types';
-import { Link } from 'react-router-dom';
 import { logout } from '../../features/users/usersThunk';
 
 interface Props {
@@ -39,7 +38,6 @@ const UserMenu: React.FC<Props> = ({user}) => {
                 onClose={handleClose}
                 keepMounted
             >
-                <MenuItem onClick={handleClose} component={Link} to="/add_item">Add new item</MenuItem>
                 <MenuItem onClick={handleLogout}>Logout</MenuItem>
             </Menu>
         </>

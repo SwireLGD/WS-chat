@@ -5,7 +5,7 @@ import { usersReducer } from "../features/users/usersSlice";
 
 
 const userPersistConfig = {
-  key: 'shop:users',
+  key: 'chat:users',
   storage,
   whitelist: ['user'],
 }
