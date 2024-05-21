@@ -12,14 +12,12 @@ const App = () => {
               <AppToolbar />
           </header>
           <main>
-              <Container maxWidth="xl">
                   <Routes>
                       <Route path='/register' element={<Register />} />
                       <Route path='/login' element={<Login />} />
                       <Route path='/' element={<Chat />} />
                       <Route path="*" element={<Typography variant="h2">Not Found</Typography>} />
                   </Routes>
-              </Container>
           </main>
       </>
   );

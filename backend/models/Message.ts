@@ -5,17 +5,9 @@ import User from "./User";
 const Schema = mongoose.Schema;
 
 const messageSchema = new Schema<MessageFields>({
-    sender: {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
+    username: {
+        type: String,
         required: true,
-        validate: {
-            validator: async (id: Types.ObjectId) => {
-              const user = await User.findById(id);
-              return Boolean(user);
-            },
-            message: 'User does not exist!',
-        },
     },
     content: { 
         type: String, 

@@ -5,7 +5,7 @@ import cors from 'cors';
 import config from './config';
 import usersRouter from './routers/users';
 import expressWs from 'express-ws';
-import { ActiveConnections } from './types';
+import { ActiveConnections, UserProp } from './types';
 import { RequestWithUser } from './middleware/auth';
 import Message from './models/Message';
 
@@ -25,17 +25,16 @@ chatRouter.ws('/chat', (ws, req: RequestWithUser) => {
         const parsedMessage = JSON.parse(message);
         switch (parsedMessage.type) {
             case 'LOGIN':
-                const userId = parsedMessage.payload?._id;
-                if (!userId) {
-                    console.log('userId missing');
+                const user: UserProp = parsedMessage.payload;
+                if (!user._id) {
+                    console.log('user is missing');
                     ws.close();
                     return;
                 }
 
-                console.log('WebSocket connection opened for user:', userId);
-
-                if (!activeConnections[userId]) {
-                    activeConnections[userId] = ws;
+                if (!activeConnections[user._id]) {
+                    activeConnections[user._id] = ws;
+                    updateParticipants();
                 }
 
                 try {
@@ -46,31 +45,40 @@ chatRouter.ws('/chat', (ws, req: RequestWithUser) => {
                 }
 
                 ws.on('close', () => {
-                    console.log('WebSocket connection closed for user:', userId);
-                    delete activeConnections[userId];
+                    console.log('WebSocket connection closed for user:', user._id);
+                    delete activeConnections[user._id];
+                    updateParticipants();
                 });
                 break;
-            case 'SEND_MESSAGE':
-                const newMessage = new Message({
-                    sender: req.user?.username,
-                    content: parsedMessage.payload,
-                });
-                try {
-                    await newMessage.save();
-                    Object.values(activeConnections).forEach(connection => {
-                        connection.send(JSON.stringify({ type: 'NEW_MESSAGE', payload: newMessage }));
+                case 'SEND_MESSAGE':
+                    const { username, content } = parsedMessage.payload;
+                    const newMessage = new Message({
+                        username: String(username),
+                        content: String(content),
                     });
-                } catch (e) {
-                    console.error('Error saving message:', e);
-                    ws.send(JSON.stringify({ type: 'ERROR', payload: 'Failed to save the message' }));
-                    return;
-                }
-                break;
+                    try {
+                        await newMessage.save();
+                        Object.values(activeConnections).forEach(connection => {
+                            connection.send(JSON.stringify({ type: 'NEW_MESSAGE', payload: newMessage }));
+                        });
+                    } catch (e) {
+                        console.error('Error saving message:', e);
+                        ws.send(JSON.stringify({ type: 'ERROR', payload: 'Failed to save the message' }));
+                        return;
+                    }
+                    break;
             default:
                 console.log('Unknown message type:', parsedMessage.type);
         }
     });
 });
+
+const updateParticipants = () => {
+    const participants = Object.keys(activeConnections);
+    Object.values(activeConnections).forEach(connection => {
+        connection.send(JSON.stringify({ type: 'PARTICIPANTS_UPDATE', payload: participants }));
+    });
+};
 
 app.use(chatRouter);
 app.use('/users', usersRouter);

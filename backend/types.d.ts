@@ -14,7 +14,7 @@ interface UserMethods {
 export type UserModel = Model<UserFields, unknown, UserMethods>;
 
 export interface MessageFields {
-    sender: Types.ObjectId;
+    username: string;
     content: string;
     timestamp: Date;
 }
@@ -26,4 +26,10 @@ export interface ActiveConnections {
 export interface IncomingMessage {
     type: string;
     payload: string;
+}
+
+export interface UserProp {
+    _id: string;
+    username: string;
+    token: string;
 }

@@ -36,6 +36,7 @@ export interface GlobalError {
 }
 
 export interface Message {
-    sender: string;
+    username: string;
     content: string;
+    timestamp: Date;
 }
