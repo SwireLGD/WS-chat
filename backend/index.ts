@@ -1,5 +1,5 @@
 import express from 'express';
-import mongoose from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 import cors from 'cors';
 
 import config from './config';
@@ -51,9 +51,9 @@ chatRouter.ws('/chat', (ws, req: RequestWithUser) => {
                 });
                 break;
                 case 'SEND_MESSAGE':
-                    const { username, content } = parsedMessage.payload;
+                    const { userId, content } = parsedMessage.payload;
                     const newMessage = new Message({
-                        username: String(username),
+                        userId: userId,
                         content: String(content),
                     });
                     try {
@@ -70,6 +70,28 @@ chatRouter.ws('/chat', (ws, req: RequestWithUser) => {
             default:
                 console.log('Unknown message type:', parsedMessage.type);
         }
+    });
+
+    const reconnect = () => {
+        setTimeout(() => {
+            const newWs = new WebSocket('ws://localhost:8000/chat');
+            newWs.onopen = () => {
+                console.log('Reconnected to server');
+            };
+            newWs.onclose = () => {
+                console.log('connection closed');
+                reconnect();
+            };
+            newWs.onerror = (error) => {
+                console.error('WS error:', error);
+                reconnect();
+            };
+        }, 2000);
+    };
+
+    ws.on('close', () => {
+        console.log('WebSocket connection closed unexpectedly');
+        reconnect();
     });
 });
 

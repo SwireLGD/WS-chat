@@ -54,7 +54,7 @@ const Chat = () => {
             ws.current.send(JSON.stringify({
                 type: 'SEND_MESSAGE',
                 payload: {
-                    username: user?.username,
+                    userId: user?._id,
                     content: newMessage
                 }
             }));
@@ -87,7 +87,7 @@ const Chat = () => {
                     <List>
                         {messages.map((message, index) => (
                             <ListItem key={index}>
-                                <ListItemText primary={`${message.username}: ${message.content}`} secondary={new Date(message.timestamp).toLocaleString()} />
+                                <ListItemText primary={`${message.userId}: ${message.content}`} secondary={new Date(message.timestamp).toLocaleString()} />
                             </ListItem>
                         ))}
                     </List>

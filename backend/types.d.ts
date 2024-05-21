@@ -14,7 +14,7 @@ interface UserMethods {
 export type UserModel = Model<UserFields, unknown, UserMethods>;
 
 export interface MessageFields {
-    username: string;
+    userId: Types.ObjectId;
     content: string;
     timestamp: Date;
 }
