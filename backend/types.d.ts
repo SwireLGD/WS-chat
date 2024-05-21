@@ -34,3 +34,9 @@ export interface UserProp {
     username: string;
     token: string;
 }
+
+export interface MessagePayload {
+    userId: string;
+    username: string;
+    content: string;
+}

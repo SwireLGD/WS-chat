@@ -5,7 +5,7 @@ import cors from 'cors';
 import config from './config';
 import usersRouter from './routers/users';
 import expressWs from 'express-ws';
-import { ActiveConnections, UserProp } from './types';
+import { ActiveConnections, MessagePayload, UserProp } from './types';
 import { RequestWithUser } from './middleware/auth';
 import Message from './models/Message';
 
@@ -51,7 +51,8 @@ chatRouter.ws('/chat', (ws, req: RequestWithUser) => {
                 });
                 break;
                 case 'SEND_MESSAGE':
-                    const { userId, username, content } = parsedMessage.payload;
+                    const messagePayload: MessagePayload = parsedMessage.payload;
+                    const { userId, username, content } = messagePayload;
                     const newMessage = new Message({
                         userId: userId,
                         username: username,
