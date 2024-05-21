@@ -55,6 +55,7 @@ const Chat = () => {
                 type: 'SEND_MESSAGE',
                 payload: {
                     userId: user?._id,
+                    username: user?.username,
                     content: newMessage
                 }
             }));
@@ -87,7 +88,7 @@ const Chat = () => {
                     <List>
                         {messages.map((message, index) => (
                             <ListItem key={index}>
-                                <ListItemText primary={`${message.userId}: ${message.content}`} secondary={new Date(message.timestamp).toLocaleString()} />
+                                <ListItemText primary={`${message.username}: ${message.content}`} secondary={new Date(message.timestamp).toLocaleString()} />
                             </ListItem>
                         ))}
                     </List>

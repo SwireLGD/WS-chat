@@ -51,9 +51,10 @@ chatRouter.ws('/chat', (ws, req: RequestWithUser) => {
                 });
                 break;
                 case 'SEND_MESSAGE':
-                    const { userId, content } = parsedMessage.payload;
+                    const { userId, username, content } = parsedMessage.payload;
                     const newMessage = new Message({
                         userId: userId,
+                        username: username,
                         content: String(content),
                     });
                     try {

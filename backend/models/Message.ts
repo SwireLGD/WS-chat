@@ -17,6 +17,10 @@ const messageSchema = new Schema<MessageFields>({
             message: 'User does not exist!',
         },
     },
+    username: {
+        type: String,
+        required: true
+    },
     content: { 
         type: String, 
         required: true 
