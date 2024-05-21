@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { useAppSelector } from "../../app/hooks"
-import { selectUser } from "../users/usersSlice"
+import { useAppSelector } from "../../app/hooks";
+import { selectUser } from "../users/usersSlice";
 import { Message } from "../../types";
 import { useNavigate } from "react-router-dom";
 import { Box, Button, List, ListItem, ListItemText, TextField } from "@mui/material";
@@ -14,11 +14,13 @@ const Chat = () => {
 
     useEffect(() => {
         if (user) {
-            ws.current = new WebSocket('ws://localhost:8000/');
+            ws.current = new WebSocket('ws://localhost:8000/chat');
             ws.current.onopen = () => {
-                ws.current?.send(JSON.stringify({ type: 'LOGIN', payload: user.token }));
+                console.log('WebSocket connected');
+                ws.current?.send(JSON.stringify({ type: 'LOGIN', payload: user }));
             };
             ws.current.onmessage = (event) => {
+                console.log('Received message:', event.data);
                 const message = JSON.parse(event.data);
                 if (message.type === 'INITIAL_MESSAGES') {
                     setMessages(message.payload);
@@ -27,33 +29,41 @@ const Chat = () => {
                 }
             };
             ws.current.onclose = () => {
-                console.log("ws closed");
+                console.log("WebSocket closed");
                 ws.current = null;
-            }
+            };
+            ws.current.onerror = (error) => {
+                console.error('WebSocket error:', error);
+            };
             return () => {
                 ws.current?.close();
             };
+        } else {
+            navigate('/login');
+            return;
         }
-    }, [user]);
+    }, [user, navigate]);
+    
 
     const sendMessage = () => {
-        if (ws.current && newMessage.trim()) {
+        console.log('Sending message:', newMessage);
+        if (ws.current && ws.current.readyState === WebSocket.OPEN && newMessage.trim()) {
             ws.current.send(JSON.stringify({type: 'SEND_MESSAGE', payload: newMessage}));
             setNewMessage('');
+        } else {
+            console.error('ws connection isn\'t open or new message is empty.');
         }
     };
-
-    if (!user) {
-        navigate('/login');
-    }
+    
+    
 
     return (
-        <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', height: '90vh' }}>
             <Box sx={{ flexGrow: 1, overflowY: 'auto', p: 2 }}>
                 <List>
                     {messages.map((message, index) => (
                         <ListItem key={index}>
-                            <ListItemText primary={`${message.username}: ${message.text}`} />
+                            <ListItemText primary={`${message.sender}: ${message.content}`} />
                         </ListItem>
                     ))}
                 </List>
